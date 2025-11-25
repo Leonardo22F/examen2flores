@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   almachi:
-    image: ghcr.io/${GH_OWNER:-leonardo22f}/almachi:${IMAGE_VERSION:-1.0.5}
+    image: ghcr.io/${GH_OWNER:-leonardo22f}/almachi:${IMAGE_VERSION:-1.0.6}
     deploy:
       replicas: 1
       labels:

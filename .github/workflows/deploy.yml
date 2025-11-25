@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE_VERSION: "1.0.5"
+  IMAGE_VERSION: "1.0.6"
   APP_NAME: "almachi"
   GH_OWNER: "leonardo22f"
   IMAGE_NAME: ghcr.io/leonardo22f/almachi

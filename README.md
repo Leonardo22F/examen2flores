@@ -23,15 +23,15 @@ pytest
 
 ## Contenedor
 ```bash
-docker build -t ghcr.io/<owner>/almachi:1.0.5 .
-docker run -p 5000:5000 ghcr.io/<owner>/almachi:1.0.5
+docker build -t ghcr.io/<owner>/almachi:1.0.6 .
+docker run -p 5000:5000 ghcr.io/<owner>/almachi:1.0.6
 ```
 
 ## Pipeline CI/CD (GitHub Actions)
 - Rama de trabajo: `almachi` (segundo apellido).
 - Jobs:
   - `test`: instala dependencias y ejecuta `pytest`.
-  - `build_and_push`: construye la imagen y la publica en GHCR con tags `1.0.5` y `latest` (`ghcr.io/<owner>/almachi`).
+- `build_and_push`: construye la imagen y la publica en GHCR con tags `1.0.6` y `latest` (`ghcr.io/<owner>/almachi`).
   - `deploy`: copia `stack.yml` al VPS y despliega con `docker stack deploy` usando la imagen publicada.
 
 ### Secrets requeridos
@@ -40,7 +40,7 @@ docker run -p 5000:5000 ghcr.io/<owner>/almachi:1.0.5
 - `STACK_NAME`: nombre del stack a desplegar en el servidor (ej. `almachi-stack`).
 
 ## Stack de despliegue
-`stack.yml` usa variables de entorno `GH_OWNER` y `IMAGE_VERSION` (por defecto `1.0.5`). El job de deploy exporta estas variables antes de ejecutar:
+`stack.yml` usa variables de entorno `GH_OWNER` y `IMAGE_VERSION` (por defecto `1.0.6`). El job de deploy exporta estas variables antes de ejecutar:
 ```bash
 docker stack deploy -c stack.yml <STACK_NAME>
 ```
