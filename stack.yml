@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  app:
+    image: ghcr.io/${GH_OWNER:-your-gh-user}/almachi:${IMAGE_VERSION:-1.0.5}
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "5000:5000"
+    networks:
+      - webnet
+
+networks:
+  webnet:
