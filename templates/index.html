@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora Almachi</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --accent: #38bdf8;
+      --accent-2: #a855f7;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --error: #f87171;
+      --success: #34d399;
+      --shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at 20% 20%, rgba(56,189,248,0.12), transparent 25%),
+                  radial-gradient(circle at 80% 0%, rgba(168,85,247,0.12), transparent 25%),
+                  var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+    }
+    .card {
+      width: 100%;
+      max-width: 860px;
+      background: linear-gradient(145deg, rgba(17,24,39,0.95), rgba(17,24,39,0.8));
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .title {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+    }
+    .pill {
+      background: rgba(56,189,248,0.1);
+      color: var(--accent);
+      border: 1px solid rgba(56,189,248,0.3);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .desc {
+      color: var(--muted);
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 80px;
+      background: #0b1221;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 15px;
+      resize: vertical;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: rgba(56,189,248,0.7);
+      box-shadow: 0 0 0 3px rgba(56,189,248,0.15);
+    }
+    button {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border: none;
+      color: #0b1221;
+      font-weight: 700;
+      padding: 14px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      min-width: 120px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 12px 30px rgba(56,189,248,0.35);
+    }
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+    .output {
+      margin-top: 18px;
+      background: #0b1221;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 16px;
+      min-height: 80px;
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      border: 1px solid rgba(255,255,255,0.05);
+      background: rgba(255,255,255,0.04);
+    }
+    .badge strong {
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 12px;
+    }
+    .status.ok { color: var(--success); }
+    .status.error { color: var(--error); }
+    .history {
+      margin-top: 20px;
+      display: grid;
+      gap: 10px;
+    }
+    .entry {
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.02);
+    }
+    .entry small { color: var(--muted); }
+    .entry .expr { font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <header>
+      <div>
+        <div class="title">Calculadora Almachi</div>
+        <div class="desc">Escribe una expresion (2+2*5) o una frase natural ("suma 5 y 3", "divide 10 entre 2").</div>
+      </div>
+      <div class="pill">API /api/calc</div>
+    </header>
+
+    <div class="input-row">
+      <textarea id="input" placeholder="Ejemplos: 2+2*5  |  suma 5 y 3  |  divide 10 entre 2"></textarea>
+      <button id="btn">Calcular</button>
+    </div>
+
+    <div class="output" id="output">
+      <div class="badge"><strong>Estado</strong><span id="status">Esperando...</span></div>
+      <div class="badge"><strong>Modo</strong><span id="mode">-</span></div>
+      <div class="badge"><strong>Resultado</strong><span id="result">-</span></div>
+    </div>
+
+    <div class="history" id="history"></div>
+  </div>
+
+  <script>
+    const inputEl = document.getElementById("input");
+    const btn = document.getElementById("btn");
+    const statusEl = document.getElementById("status");
+    const modeEl = document.getElementById("mode");
+    const resultEl = document.getElementById("result");
+    const historyEl = document.getElementById("history");
+
+    const setStatus = (msg, ok=true) => {
+      statusEl.textContent = msg;
+      statusEl.className = ok ? "status ok" : "status error";
+    };
+
+    const addHistory = (expr, mode, res, ok=true) => {
+      const div = document.createElement("div");
+      div.className = "entry";
+      div.innerHTML = `<div class="expr">${expr}</div>
+        <small>${ok ? "OK" : "Error"} • Modo: ${mode} • Resultado: ${res}</small>`;
+      historyEl.prepend(div);
+    };
+
+    const calculate = async () => {
+      const value = inputEl.value.trim();
+      if (!value) {
+        setStatus("Escribe algo", false);
+        return;
+      }
+      setStatus("Calculando...");
+      try {
+        const res = await fetch("/api/calc", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ input: value })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Error en la API");
+        modeEl.textContent = data.mode;
+        resultEl.textContent = data.result;
+        setStatus("Listo", true);
+        addHistory(value, data.mode, data.result, true);
+      } catch (err) {
+        modeEl.textContent = "-";
+        resultEl.textContent = "-";
+        setStatus(err.message, false);
+        addHistory(value, "-", err.message, false);
+      }
+    };
+
+    btn.addEventListener("click", calculate);
+    inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+        calculate();
+      }
+    });
+  </script>
+</body>
+</html>

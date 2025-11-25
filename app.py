@@ -5,7 +5,7 @@ import operator
 import re
 from typing import Callable, Optional
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, render_template, request
 
 app = Flask(__name__)
 
@@ -90,12 +90,7 @@ def ai_resolve(text: str) -> float:
 
 @app.route("/", methods=["GET"])
 def root():
-    return jsonify(
-        {
-            "message": "Calculadora Flask con interprete basico de lenguaje natural.",
-            "usage": "POST /api/calc con JSON {'input': 'suma 5 y 3'} o {'input': '2+2*2'}",
-        }
-    )
+    return render_template("index.html")
 
 
 @app.route("/health", methods=["GET"])
